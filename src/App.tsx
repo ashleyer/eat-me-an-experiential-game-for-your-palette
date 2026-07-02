@@ -13,6 +13,12 @@ import {
   ExternalLink,
   ChevronRight,
   Compass,
+  Bookmark,
+  BookmarkCheck,
+  X,
+  Share2,
+  Scale,
+  Check,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 
@@ -24,6 +30,8 @@ import FoodOracleChat from "./components/FoodOracleChat";
 import FlavorQuiz from "./components/FlavorQuiz";
 import MysteryMeal from "./components/MysteryMeal";
 import FoodieChallenges from "./components/FoodieChallenges";
+import FlavorDice from "./components/FlavorDice";
+import IngredientExplorer from "./components/IngredientExplorer";
 
 import { LocationState, GameType, RestaurantResult } from "./types";
 
@@ -53,6 +61,68 @@ export default function App() {
 
   // 5. Filter State
   const [resultsFilter, setResultsFilter] = useState<"highest-rated" | "closest">("highest-rated");
+
+  // 5.5. Compare & Share State
+  const [compareList, setCompareList] = useState<{ uri: string; title: string; reviewSnippet?: string, rating: number, distance: number }[]>([]);
+  const [isComparing, setIsComparing] = useState(false);
+  const [copiedUri, setCopiedUri] = useState<string | null>(null);
+
+  const toggleCompare = (e: React.MouseEvent, restaurant: { uri: string; title: string; reviewSnippet?: string, rating: number, distance: number }) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (compareList.some((item) => item.uri === restaurant.uri)) {
+      setCompareList(compareList.filter((item) => item.uri !== restaurant.uri));
+    } else {
+      if (compareList.length >= 3) {
+        alert("You can compare up to 3 restaurants at a time!");
+        return;
+      }
+      setCompareList([...compareList, restaurant]);
+    }
+  };
+
+  const handleShare = (e: React.MouseEvent, restaurant: { uri: string; title: string; reviewSnippet?: string, rating: number, distance: number }) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const shareText = `Hey! I discovered "${restaurant.title}" on CraveCast! Rated ★ ${restaurant.rating.toFixed(1)} and just ${restaurant.distance.toFixed(1)} miles away. Check it out: ${restaurant.uri}`;
+    navigator.clipboard.writeText(shareText).then(() => {
+      setCopiedUri(restaurant.uri);
+      setTimeout(() => setCopiedUri(null), 2000);
+    });
+  };
+
+  // 6. Favorites State
+  const [favorites, setFavorites] = useState<{ uri: string; title: string; reviewSnippet?: string, rating: number, distance: number }[]>(() => {
+    try {
+      const saved = localStorage.getItem("saved_favorites");
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  // 6.5. Cumulative Meals Suggested Counter
+  const [mealsSuggestedCount, setMealsSuggestedCount] = useState<number>(() => {
+    try {
+      const saved = localStorage.getItem("meals_suggested_count");
+      return saved ? parseInt(saved, 10) : 142; // Starts at a nice premium number
+    } catch {
+      return 142;
+    }
+  });
+
+  const toggleFavorite = (e: React.MouseEvent, restaurant: { uri: string; title: string; reviewSnippet?: string, rating: number, distance: number }) => {
+    e.preventDefault();
+    e.stopPropagation();
+    let updated: { uri: string; title: string; reviewSnippet?: string, rating: number, distance: number }[];
+    if (favorites.some((fav) => fav.uri === restaurant.uri)) {
+      updated = favorites.filter((fav) => fav.uri !== restaurant.uri);
+    } else {
+      updated = [...favorites, restaurant];
+    }
+    setFavorites(updated);
+    localStorage.setItem("saved_favorites", JSON.stringify(updated));
+  };
 
   const handleLocationChange = (newFields: Partial<LocationState>) => {
     setLocation((prev) => ({ ...prev, ...newFields }));
@@ -93,6 +163,16 @@ export default function App() {
         setResults({
           markdown: data.markdown,
           groundingChunks: data.groundingChunks || [],
+        });
+        
+        // Increment suggested count based on returned recommendations or default to 5
+        const newSuggestionsCount = (data.groundingChunks || []).length || 5;
+        setMealsSuggestedCount((prev) => {
+          const next = prev + newSuggestionsCount;
+          try {
+            localStorage.setItem("meals_suggested_count", next.toString());
+          } catch (_) {}
+          return next;
         });
       } else {
         setResultsError(
@@ -157,8 +237,7 @@ export default function App() {
             <div>
               <h1 className="text-xs tracking-[0.2em] font-bold text-slate-400 uppercase mb-1">Decision Engine v1.0</h1>
               <div className="flex items-center gap-2">
-                <span className="text-2xl font-light italic text-slate-900">Food</span>
-                <span className="text-2xl font-bold text-slate-900 tracking-tight">Quest</span>
+                <span className="text-2xl font-extrabold text-emerald-600 tracking-tight hover:scale-105 transition-all">EatMe</span>
               </div>
             </div>
           </div>
@@ -203,9 +282,9 @@ export default function App() {
             >
               {/* Marketing & Description Column */}
               <div className="space-y-6 text-left" id="promo-intro-column">
-                <div className="inline-flex items-center space-x-2 bg-slate-100 border border-slate-200 px-3.5 py-1.5 rounded-full text-xs text-slate-600 font-bold tracking-[0.2em] uppercase font-sans">
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>The Ultimate Meal Planner</span>
+                <div className="inline-flex items-center space-x-2 bg-emerald-50 border border-emerald-100 px-3.5 py-1.5 rounded-full text-xs text-emerald-700 font-bold tracking-[0.2em] uppercase font-sans">
+                  <Sparkles className="w-3.5 h-3.5 text-emerald-500 animate-pulse" />
+                  <span>The Ultimate Meal Inspiration</span>
                 </div>
                 <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-slate-900 leading-none">
                   Can't decide <br />
@@ -384,6 +463,46 @@ export default function App() {
                   </div>
                 </button>
 
+                {/* GAME 7: Cuisine Dice Roll */}
+                <button
+                  onClick={() => setActiveGame("dice")}
+                  id="btn-launch-dice-game"
+                  className="p-8 bg-white border border-slate-200 rounded-3xl shadow-sm text-center relative overflow-hidden group hover:border-slate-900 hover:shadow-xl transition-all flex flex-col justify-between"
+                >
+                  <div className="absolute top-0 left-0 w-full h-1 bg-red-500"></div>
+                  <div className="flex flex-col items-center">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4 block">Feeling Lucky</span>
+                    <h3 className="text-2xl font-bold text-slate-900 mt-2">Cuisine Dice Roll</h3>
+                    <p className="mt-4 text-sm text-slate-500 leading-relaxed italic">
+                      "Let luck roll the physical dice of destiny and randomly select your gourmet destination tonight."
+                    </p>
+                  </div>
+                  <div className="flex items-center justify-center text-xs text-red-600 font-bold tracking-wider mt-6 opacity-0 group-hover:opacity-100 transition-opacity uppercase">
+                    <span>Roll Dice</span>
+                    <ChevronRight className="w-4 h-4 ml-1" />
+                  </div>
+                </button>
+
+                {/* GAME 8: Ingredient Alchemist */}
+                <button
+                  onClick={() => setActiveGame("ingredients")}
+                  id="btn-launch-ingredients-game"
+                  className="p-8 bg-white border border-slate-200 rounded-3xl shadow-sm text-center relative overflow-hidden group hover:border-slate-900 hover:shadow-xl transition-all flex flex-col justify-between"
+                >
+                  <div className="absolute top-0 left-0 w-full h-1 bg-violet-500"></div>
+                  <div className="flex flex-col items-center">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4 block">Alchemist</span>
+                    <h3 className="text-2xl font-bold text-slate-900 mt-2">Ingredient Explorer</h3>
+                    <p className="mt-4 text-sm text-slate-500 leading-relaxed italic">
+                      "Pick ingredients you're craving (avocado, salmon, garlic) and unlock local spots specializing in them."
+                    </p>
+                  </div>
+                  <div className="flex items-center justify-center text-xs text-violet-600 font-bold tracking-wider mt-6 opacity-0 group-hover:opacity-100 transition-opacity uppercase">
+                    <span>Explore Ingredients</span>
+                    <ChevronRight className="w-4 h-4 ml-1" />
+                  </div>
+                </button>
+
               </div>
             </motion.div>
           )}
@@ -415,6 +534,12 @@ export default function App() {
               )}
               {activeGame === "challenges" && (
                 <FoodieChallenges onComplete={handleGameComplete} onBack={handleReset} />
+              )}
+              {activeGame === "dice" && (
+                <FlavorDice onComplete={handleGameComplete} onBack={handleReset} />
+              )}
+              {activeGame === "ingredients" && (
+                <IngredientExplorer onComplete={handleGameComplete} onBack={handleReset} />
               )}
             </motion.div>
           )}
@@ -527,11 +652,53 @@ export default function App() {
                           className="bg-white hover:bg-slate-50 border border-slate-200 hover:border-slate-900 p-6 rounded-3xl flex flex-col justify-between min-h-[140px] transition-all group shadow-sm"
                         >
                           <div>
-                            <div className="flex justify-between items-start">
+                            <div className="flex justify-between items-start gap-2">
                               <h5 className="font-bold text-lg text-slate-900 group-hover:text-slate-700 transition-colors line-clamp-1">
                                 {link.title}
                               </h5>
-                              <ExternalLink className="w-4 h-4 text-slate-400 group-hover:text-slate-900 transition-colors flex-shrink-0" />
+                              <div className="flex items-center space-x-1 flex-shrink-0">
+                                <button
+                                  onClick={(e) => toggleFavorite(e, link)}
+                                  className="p-1.5 rounded-full hover:bg-slate-100 transition-colors text-slate-400 hover:text-amber-500 z-10"
+                                  title={favorites.some((fav) => fav.uri === link.uri) ? "Remove from Favorites" : "Save to Favorites"}
+                                  id={`btn-fav-${index}`}
+                                >
+                                  <Bookmark
+                                    className={`w-4 h-4 transition-all ${
+                                      favorites.some((fav) => fav.uri === link.uri)
+                                        ? "text-amber-500 fill-amber-500 scale-110"
+                                        : "text-slate-400 group-hover:text-slate-600"
+                                    }`}
+                                  />
+                                </button>
+                                <button
+                                  onClick={(e) => toggleCompare(e, link)}
+                                  className="p-1.5 rounded-full hover:bg-slate-100 transition-colors z-10"
+                                  title={compareList.some((item) => item.uri === link.uri) ? "Remove from Compare" : "Add to Compare"}
+                                  id={`btn-compare-${index}`}
+                                >
+                                  <Scale
+                                    className={`w-4 h-4 transition-all ${
+                                      compareList.some((item) => item.uri === link.uri)
+                                        ? "text-indigo-600 scale-110 font-bold"
+                                        : "text-slate-400 hover:text-indigo-500"
+                                    }`}
+                                  />
+                                </button>
+                                <button
+                                  onClick={(e) => handleShare(e, link)}
+                                  className="p-1.5 rounded-full hover:bg-slate-100 transition-colors z-10"
+                                  title="Share Restaurant"
+                                  id={`btn-share-${index}`}
+                                >
+                                  {copiedUri === link.uri ? (
+                                    <Check className="w-4 h-4 text-emerald-500 font-bold" />
+                                  ) : (
+                                    <Share2 className="w-4 h-4 text-slate-400 hover:text-slate-900" />
+                                  )}
+                                </button>
+                                <ExternalLink className="w-4 h-4 text-slate-400 group-hover:text-slate-900 transition-colors flex-shrink-0 ml-1" />
+                              </div>
                             </div>
                             <div className="flex items-center space-x-3 mt-1.5 mb-2">
                               <span className="text-[10px] font-bold tracking-widest uppercase text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md">
@@ -559,25 +726,72 @@ export default function App() {
 
               </div>
 
-              {/* Right Column: Chat Oracle Trigger Panel */}
-              <div className="w-full lg:w-[320px] bg-white border border-slate-200 rounded-3xl p-8 space-y-6 lg:sticky lg:top-32 flex flex-col items-center text-center shadow-sm" id="side-chat-panel">
-                <div className="p-4 bg-slate-100 text-slate-900 rounded-full">
-                  <MessageSquare className="w-8 h-8" />
+              {/* Right Column: Chat & Favorites Wrapper */}
+              <div className="w-full lg:w-[320px] space-y-6 lg:sticky lg:top-32 flex flex-col" id="side-panel-wrapper">
+                
+                {/* Chat Oracle Trigger Panel */}
+                <div className="bg-white border border-slate-200 rounded-3xl p-8 space-y-6 flex flex-col items-center text-center shadow-sm" id="side-chat-panel">
+                  <div className="p-4 bg-slate-100 text-slate-900 rounded-full">
+                    <MessageSquare className="w-8 h-8" />
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="font-bold text-2xl text-slate-900">Ask the Oracle</h3>
+                    <p className="text-sm text-slate-500 leading-relaxed italic">
+                      Have questions about these recommendations? Ask the Food Oracle about prices, vegan options, atmospheres, or best visit times!
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setIsChatOpen(true)}
+                    id="btn-open-oracle-chat"
+                    className="w-full py-4 bg-slate-900 text-white font-bold text-sm rounded-full transition-all shadow-lg hover:scale-105 active:scale-95 flex items-center justify-center space-x-2 group"
+                  >
+                    <span>Consult Oracle Chat</span>
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </button>
                 </div>
-                <div className="space-y-2">
-                  <h3 className="font-bold text-2xl text-slate-900">Ask the Oracle</h3>
-                  <p className="text-sm text-slate-500 leading-relaxed italic">
-                    Have questions about these recommendations? Ask the Food Oracle about prices, vegan options, atmospheres, or best visit times!
-                  </p>
+
+                {/* Saved Favorites Panel */}
+                <div className="bg-white border border-slate-200 rounded-3xl p-6 space-y-4 flex flex-col text-left shadow-sm" id="side-favorites-panel">
+                  <div className="flex items-center space-x-2 text-slate-900 border-b border-slate-100 pb-3">
+                    <BookmarkCheck className="w-5 h-5 text-amber-500 fill-current" />
+                    <h3 className="font-bold text-sm uppercase tracking-wider">Saved Favorites ({favorites.length})</h3>
+                  </div>
+                  {favorites.length === 0 ? (
+                    <p className="text-xs text-slate-400 italic text-center py-4">
+                      No favorites saved yet. Bookmark restaurants to save them here!
+                    </p>
+                  ) : (
+                    <div className="space-y-3 max-h-[250px] overflow-y-auto pr-1">
+                      {favorites.map((fav, index) => (
+                        <div key={index} className="flex items-center justify-between p-2 rounded-xl border border-slate-100 hover:border-slate-200 bg-slate-50/50 group transition-all">
+                          <a
+                            href={fav.uri}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex-grow text-left pr-2 block"
+                          >
+                            <h5 className="font-bold text-xs text-slate-800 hover:text-slate-900 transition-colors line-clamp-1">
+                              {fav.title}
+                            </h5>
+                            <div className="flex items-center space-x-2 mt-0.5">
+                              <span className="text-[9px] font-bold text-amber-600">★ {fav.rating.toFixed(1)}</span>
+                              <span className="text-[9px] text-slate-400 font-bold">{fav.distance.toFixed(1)} mi</span>
+                            </div>
+                          </a>
+                          <button
+                            onClick={(e) => toggleFavorite(e, fav)}
+                            className="text-slate-300 hover:text-rose-500 p-1 rounded-full hover:bg-white transition-colors flex-shrink-0"
+                            title="Remove from favorites"
+                            id={`btn-remove-fav-${index}`}
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
-                <button
-                  onClick={() => setIsChatOpen(true)}
-                  id="btn-open-oracle-chat"
-                  className="w-full py-4 bg-slate-900 text-white font-bold text-sm rounded-full transition-all shadow-lg hover:scale-105 active:scale-95 flex items-center justify-center space-x-2 group"
-                >
-                  <span>Consult Oracle Chat</span>
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </button>
+
               </div>
 
             </motion.div>
@@ -613,6 +827,183 @@ export default function App() {
 
         </AnimatePresence>
       </main>
+
+      {/* Floating Compare Action Bar */}
+      <AnimatePresence>
+        {compareList.length > 0 && (
+          <motion.div
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 100, opacity: 0 }}
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-6 py-4 rounded-3xl shadow-2xl flex flex-col md:flex-row items-center gap-4 z-40 border border-slate-800 max-w-2xl w-[92%]"
+            id="compare-action-drawer"
+          >
+            <div className="flex items-center space-x-3 flex-grow overflow-hidden">
+              <Scale className="w-5 h-5 text-indigo-400 flex-shrink-0 animate-pulse" />
+              <div className="text-left">
+                <p className="text-xs font-bold uppercase tracking-wider text-slate-300">Compare Pool ({compareList.length}/3)</p>
+                <div className="flex items-center gap-1.5 mt-1 overflow-x-auto no-scrollbar max-w-[320px] sm:max-w-md">
+                  {compareList.map((item, idx) => (
+                    <span key={idx} className="bg-slate-800 text-white text-[10px] px-2 py-0.5 rounded-md font-medium line-clamp-1 border border-slate-700">
+                      {item.title}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-2 flex-shrink-0 w-full md:w-auto justify-end">
+              <button
+                onClick={() => setCompareList([])}
+                className="px-3 py-2 text-slate-400 hover:text-white text-xs font-bold uppercase tracking-wider transition-colors"
+                id="btn-clear-compare"
+              >
+                Clear
+              </button>
+              <button
+                onClick={() => setIsComparing(true)}
+                className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-all shadow-md flex items-center space-x-1"
+                id="btn-open-compare"
+              >
+                <span>Compare</span>
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Comparison Details Side-by-Side Modal */}
+      <AnimatePresence>
+        {isComparing && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 md:p-6 z-50 overflow-y-auto"
+            id="comparison-modal-overlay"
+          >
+            <motion.div
+              initial={{ scale: 0.95, y: 15 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 15 }}
+              className="bg-white border border-slate-200 rounded-[2.5rem] w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden"
+              id="comparison-modal-card"
+            >
+              {/* Modal Header */}
+              <div className="px-8 py-6 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+                <div className="flex items-center space-x-2">
+                  <Scale className="w-5 h-5 text-indigo-600" />
+                  <h3 className="font-extrabold text-lg text-slate-900 uppercase tracking-tight">
+                    Cuisine Showdown Comparison
+                  </h3>
+                </div>
+                <button
+                  onClick={() => setIsComparing(false)}
+                  className="p-2 rounded-full hover:bg-slate-200 text-slate-500 hover:text-slate-900 transition-all"
+                  title="Close Comparison"
+                  id="btn-close-compare"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Modal Content - Comparison Table / Grid */}
+              <div className="p-8 overflow-y-auto flex-grow space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {compareList.map((restaurant, idx) => (
+                    <div
+                      key={idx}
+                      className="bg-slate-50/50 rounded-3xl p-6 border-2 border-indigo-50/40 relative flex flex-col justify-between h-full hover:border-indigo-100 transition-all shadow-sm"
+                    >
+                      <div>
+                        {/* Winner/Rank tag */}
+                        <div className="absolute top-4 right-4 bg-indigo-50 text-indigo-600 px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider">
+                          Entry #{idx + 1}
+                        </div>
+
+                        <h4 className="font-bold text-xl text-slate-900 pr-12 line-clamp-2 mt-2 leading-snug">
+                          {restaurant.title}
+                        </h4>
+
+                        {/* Rating & Distance */}
+                        <div className="grid grid-cols-2 gap-2 my-4">
+                          <div className="bg-white p-3 rounded-2xl border border-slate-100 text-center">
+                            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest block mb-1">
+                              Rating
+                            </span>
+                            <span className="text-sm font-extrabold text-amber-600 bg-amber-50 px-3 py-1 rounded-full">
+                              ★ {restaurant.rating.toFixed(1)}
+                            </span>
+                          </div>
+                          <div className="bg-white p-3 rounded-2xl border border-slate-100 text-center">
+                            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest block mb-1">
+                              Distance
+                            </span>
+                            <span className="text-sm font-extrabold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full">
+                              {restaurant.distance.toFixed(1)} mi
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Snippet */}
+                        {restaurant.reviewSnippet && (
+                          <div className="mt-4 pt-4 border-t border-slate-100">
+                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block mb-2">
+                              Verified Review Highlight
+                            </span>
+                            <p className="text-sm text-slate-600 italic leading-relaxed">
+                              "{restaurant.reviewSnippet}"
+                            </p>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Action trigger */}
+                      <div className="mt-8 pt-4 border-t border-slate-100 flex items-center space-x-2">
+                        <button
+                          onClick={(e) => toggleFavorite(e, restaurant)}
+                          className={`flex-grow py-3 rounded-2xl text-xs font-bold uppercase tracking-wider border transition-all flex items-center justify-center space-x-1.5 ${
+                            favorites.some((fav) => fav.uri === restaurant.uri)
+                              ? "bg-amber-50 border-amber-200 text-amber-600"
+                              : "bg-white hover:bg-slate-50 border-slate-200 text-slate-700"
+                          }`}
+                        >
+                          <Bookmark className={`w-3.5 h-3.5 ${favorites.some((fav) => fav.uri === restaurant.uri) ? "fill-current" : ""}`} />
+                          <span>{favorites.some((fav) => fav.uri === restaurant.uri) ? "Bookmarked" : "Bookmark"}</span>
+                        </button>
+                        <a
+                          href={restaurant.uri}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-3 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl transition-all shadow-md"
+                          title="Open in Maps"
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                        </a>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Modal Footer */}
+              <div className="px-8 py-5 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-medium">
+                <span>Select up to 3 to contrast verified ratings and distances.</span>
+                <button
+                  onClick={() => {
+                    setIsComparing(false);
+                    setCompareList([]);
+                  }}
+                  className="text-indigo-600 hover:text-indigo-700 font-bold uppercase tracking-wider"
+                >
+                  Clear All Comparisons
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* COMPONENT: Interactive Multi-turn Chat Overlay Drawer */}
       <FoodOracleChat

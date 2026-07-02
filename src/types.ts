@@ -7,7 +7,7 @@ export interface LocationState {
   error: string | null;
 }
 
-export type GameType = "swipe" | "bracket" | "wheel" | "quiz" | "mystery" | "challenges";
+export type GameType = "swipe" | "bracket" | "wheel" | "quiz" | "mystery" | "challenges" | "dice" | "ingredients";
 
 export interface SwipeCard {
   id: string;

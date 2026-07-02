@@ -1,5 +1,5 @@
 {
-  "name": "Food Quest",
+  "name": "EatMe",
   "description": "A gamified experience to find your perfect local dining options using interactive taste mini-games, Google Maps, and Gemini.",
   "requestFramePermissions": ["geolocation"],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
