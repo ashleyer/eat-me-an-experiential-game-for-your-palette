@@ -71,12 +71,12 @@ export default function IngredientExplorer({ onComplete, onBack }: IngredientExp
 
       {/* Main Form container */}
       <div className="flex-grow flex flex-col justify-between my-4 bg-white border border-slate-200 rounded-3xl p-6 shadow-sm relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-1 bg-violet-500"></div>
+        <div className="absolute top-0 left-0 w-full h-1 bg-emerald-500"></div>
 
         <div>
           {/* Visual guidance */}
           <div className="text-center mb-6">
-            <span className="text-[9px] font-extrabold text-violet-600 uppercase tracking-widest block mb-1">Ingredient Search</span>
+            <span className="text-[9px] font-extrabold text-emerald-600 uppercase tracking-widest block mb-1">Ingredient Search</span>
             <h3 className="text-2xl font-bold text-slate-900 leading-none">Craving Alchemy</h3>
             <p className="text-xs text-slate-400 mt-2 italic leading-relaxed">
               Combine your favorite ingredients, we'll locate local dishes featuring them.
@@ -118,16 +118,16 @@ export default function IngredientExplorer({ onComplete, onBack }: IngredientExp
                       initial={{ scale: 0.8, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
                       exit={{ scale: 0.8, opacity: 0 }}
-                      className="inline-flex items-center space-x-1 text-xs font-bold uppercase tracking-wider bg-violet-50 border border-violet-100 text-violet-700 px-3 py-1.5 rounded-full"
+                      className="inline-flex items-center space-x-1 text-xs font-bold uppercase tracking-wider bg-emerald-50 border border-emerald-100 text-emerald-700 px-3 py-1.5 rounded-full"
                     >
                       <span>{ing}</span>
                       <button
                         onClick={() => handleRemoveIngredient(idx)}
-                        className="p-0.5 hover:bg-violet-100 rounded-full transition-colors"
+                        className="p-0.5 hover:bg-emerald-100 rounded-full transition-colors"
                         title="Remove"
                         id={`btn-remove-ing-${idx}`}
                       >
-                        <X className="w-3 h-3 text-violet-500" />
+                        <X className="w-3 h-3 text-emerald-500" />
                       </button>
                     </motion.span>
                   ))}

@@ -335,7 +335,7 @@ export default function App() {
               id="dashboard-view"
             >
               <div className="space-y-2">
-                <h2 className="text-4xl font-bold tracking-tight text-slate-900">Choose Your Food Quest</h2>
+                <h2 className="text-4xl font-bold tracking-tight text-slate-900">Choose Your EatMe Quest</h2>
                 <p className="text-slate-500 text-sm max-w-md mx-auto italic">
                   Pick a gamified challenge below to unlock your craving profile and locate matched dining options.
                 </p>
@@ -349,7 +349,7 @@ export default function App() {
                   id="btn-launch-swipe-game"
                   className="p-8 bg-white border border-slate-200 rounded-3xl shadow-sm text-center relative overflow-hidden group hover:border-slate-900 hover:shadow-xl transition-all flex flex-col justify-between"
                 >
-                  <div className="absolute top-0 left-0 w-full h-1 bg-indigo-500"></div>
+                  <div className="absolute top-0 left-0 w-full h-1 bg-emerald-500"></div>
                   <div className="flex flex-col items-center">
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4 block">Interactive</span>
                     <h3 className="text-2xl font-bold text-slate-900 mt-2">Craving Swiper</h3>
@@ -357,7 +357,7 @@ export default function App() {
                       "Swipe through dynamic flavor profiles (Yum vs. Nah) to compute your ultimate craving blueprint."
                     </p>
                   </div>
-                  <div className="flex items-center justify-center text-xs text-indigo-600 font-bold tracking-wider mt-6 opacity-0 group-hover:opacity-100 transition-opacity uppercase">
+                  <div className="flex items-center justify-center text-xs text-emerald-600 font-bold tracking-wider mt-6 opacity-0 group-hover:opacity-100 transition-opacity uppercase">
                     <span>Start Swiping</span>
                     <ChevronRight className="w-4 h-4 ml-1" />
                   </div>
@@ -489,7 +489,7 @@ export default function App() {
                   id="btn-launch-ingredients-game"
                   className="p-8 bg-white border border-slate-200 rounded-3xl shadow-sm text-center relative overflow-hidden group hover:border-slate-900 hover:shadow-xl transition-all flex flex-col justify-between"
                 >
-                  <div className="absolute top-0 left-0 w-full h-1 bg-violet-500"></div>
+                  <div className="absolute top-0 left-0 w-full h-1 bg-emerald-500"></div>
                   <div className="flex flex-col items-center">
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4 block">Alchemist</span>
                     <h3 className="text-2xl font-bold text-slate-900 mt-2">Ingredient Explorer</h3>
@@ -497,7 +497,7 @@ export default function App() {
                       "Pick ingredients you're craving (avocado, salmon, garlic) and unlock local spots specializing in them."
                     </p>
                   </div>
-                  <div className="flex items-center justify-center text-xs text-violet-600 font-bold tracking-wider mt-6 opacity-0 group-hover:opacity-100 transition-opacity uppercase">
+                  <div className="flex items-center justify-center text-xs text-emerald-600 font-bold tracking-wider mt-6 opacity-0 group-hover:opacity-100 transition-opacity uppercase">
                     <span>Explore Ingredients</span>
                     <ChevronRight className="w-4 h-4 ml-1" />
                   </div>
@@ -555,8 +555,9 @@ export default function App() {
               id="loading-results-screen"
             >
               <div className="relative flex items-center justify-center">
-                <div className="w-20 h-20 rounded-full border-4 border-slate-200 border-t-slate-900 animate-spin"></div>
-                <UtensilsCrossed className="w-8 h-8 text-slate-900 absolute animate-pulse" />
+                <div className="absolute w-24 h-24 rounded-full bg-emerald-400/10 animate-ping"></div>
+                <div className="w-20 h-20 rounded-full border-4 border-emerald-100 border-t-emerald-600 animate-spin"></div>
+                <UtensilsCrossed className="w-8 h-8 text-emerald-600 absolute animate-pulse" />
               </div>
               <div className="space-y-2">
                 <h3 className="text-xl font-bold text-slate-900">Consulting Google Maps...</h3>
@@ -680,8 +681,8 @@ export default function App() {
                                   <Scale
                                     className={`w-4 h-4 transition-all ${
                                       compareList.some((item) => item.uri === link.uri)
-                                        ? "text-indigo-600 scale-110 font-bold"
-                                        : "text-slate-400 hover:text-indigo-500"
+                                        ? "text-emerald-600 scale-110 font-bold"
+                                        : "text-slate-400 hover:text-emerald-500"
                                     }`}
                                   />
                                 </button>
@@ -806,7 +807,7 @@ export default function App() {
               className="text-center py-12 flex flex-col items-center justify-center space-y-4"
               id="error-results-screen"
             >
-              <div className="p-4 bg-slate-100 text-slate-900 rounded-full">
+              <div className="p-4 bg-emerald-50 text-emerald-600 rounded-full">
                 <RotateCcw className="w-8 h-8 animate-spin" />
               </div>
               <div>
@@ -818,7 +819,7 @@ export default function App() {
               <button
                 onClick={handleReset}
                 id="btn-error-retry"
-                className="px-6 py-3 bg-slate-900 text-white rounded-full text-xs font-bold uppercase tracking-wider transition-all hover:scale-105 active:scale-95 shadow-lg"
+                className="px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-full text-xs font-bold uppercase tracking-wider transition-all hover:scale-105 active:scale-95 shadow-lg"
               >
                 Try Again
               </button>
@@ -839,7 +840,7 @@ export default function App() {
             id="compare-action-drawer"
           >
             <div className="flex items-center space-x-3 flex-grow overflow-hidden">
-              <Scale className="w-5 h-5 text-indigo-400 flex-shrink-0 animate-pulse" />
+              <Scale className="w-5 h-5 text-emerald-400 flex-shrink-0 animate-pulse" />
               <div className="text-left">
                 <p className="text-xs font-bold uppercase tracking-wider text-slate-300">Compare Pool ({compareList.length}/3)</p>
                 <div className="flex items-center gap-1.5 mt-1 overflow-x-auto no-scrollbar max-w-[320px] sm:max-w-md">
@@ -862,7 +863,7 @@ export default function App() {
               </button>
               <button
                 onClick={() => setIsComparing(true)}
-                className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-all shadow-md flex items-center space-x-1"
+                className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-all shadow-md flex items-center space-x-1"
                 id="btn-open-compare"
               >
                 <span>Compare</span>
@@ -893,7 +894,7 @@ export default function App() {
               {/* Modal Header */}
               <div className="px-8 py-6 border-b border-slate-100 flex items-center justify-between bg-slate-50">
                 <div className="flex items-center space-x-2">
-                  <Scale className="w-5 h-5 text-indigo-600" />
+                  <Scale className="w-5 h-5 text-emerald-600" />
                   <h3 className="font-extrabold text-lg text-slate-900 uppercase tracking-tight">
                     Cuisine Showdown Comparison
                   </h3>
@@ -914,11 +915,11 @@ export default function App() {
                   {compareList.map((restaurant, idx) => (
                     <div
                       key={idx}
-                      className="bg-slate-50/50 rounded-3xl p-6 border-2 border-indigo-50/40 relative flex flex-col justify-between h-full hover:border-indigo-100 transition-all shadow-sm"
+                      className="bg-slate-50/50 rounded-3xl p-6 border-2 border-emerald-50/40 relative flex flex-col justify-between h-full hover:border-emerald-100 transition-all shadow-sm"
                     >
                       <div>
                         {/* Winner/Rank tag */}
-                        <div className="absolute top-4 right-4 bg-indigo-50 text-indigo-600 px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider">
+                        <div className="absolute top-4 right-4 bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider">
                           Entry #{idx + 1}
                         </div>
 
@@ -995,7 +996,7 @@ export default function App() {
                     setIsComparing(false);
                     setCompareList([]);
                   }}
-                  className="text-indigo-600 hover:text-indigo-700 font-bold uppercase tracking-wider"
+                  className="text-emerald-600 hover:text-emerald-700 font-bold uppercase tracking-wider"
                 >
                   Clear All Comparisons
                 </button>
@@ -1013,8 +1014,26 @@ export default function App() {
       />
 
       {/* Footer copyright */}
-      <footer className="px-10 py-6 border-t border-slate-100 flex items-center justify-between bg-white text-slate-500 text-[10px] uppercase font-bold tracking-wider" id="app-footer">
-        <div>&copy; {new Date().getFullYear()} Decision Engine.</div>
+      <footer className="px-10 py-6 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between bg-white text-slate-500 text-[10px] uppercase font-bold tracking-wider gap-4" id="app-footer">
+        <div className="flex items-center space-x-1.5">
+          <span>Created by</span>
+          <a
+            href="https://github.com/ashleyer"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-emerald-600 hover:text-emerald-700 hover:underline transition-all"
+          >
+            @ashleyer
+          </a>
+          <span>💚 2026</span>
+        </div>
+
+        {/* Cumulative suggestions counter */}
+        <div className="flex items-center space-x-2 bg-emerald-50 border border-emerald-100 px-3 py-1.5 rounded-full text-[10px] text-emerald-700 font-extrabold tracking-wider shadow-sm animate-pulse">
+          <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+          <span>{mealsSuggestedCount.toLocaleString()} Culinary Matches Suggested</span>
+        </div>
+
         <div>Harnessing Google Maps & Gemini</div>
       </footer>
     </div>

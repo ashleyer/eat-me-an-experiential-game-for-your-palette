@@ -62,7 +62,7 @@ export default function FlavorQuiz({ onComplete, onBack }: FlavorQuizProps) {
             transition={{ duration: 0.3 }}
             className="bg-white border border-slate-200 rounded-3xl p-8 shadow-sm text-center relative overflow-hidden"
           >
-            <div className="absolute top-0 left-0 w-full h-1 bg-indigo-500"></div>
+            <div className="absolute top-0 left-0 w-full h-1 bg-emerald-500"></div>
             <h3 className="text-2xl font-bold text-slate-900 mb-8">{QUESTIONS[step].title}</h3>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
