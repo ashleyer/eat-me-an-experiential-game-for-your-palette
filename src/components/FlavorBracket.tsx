@@ -72,22 +72,22 @@ export default function FlavorBracket({ onComplete, onBack }: FlavorBracketProps
   const totalMatchesNum = currentRoundNodes.length / 2;
 
   return (
-    <div className="w-full max-w-md mx-auto flex flex-col items-center h-[540px] justify-between text-slate-100" id="flavor-bracket-game">
+    <div className="w-full max-w-md mx-auto flex flex-col items-center h-[540px] justify-between text-slate-800" id="flavor-bracket-game">
       {/* Header */}
       <div className="w-full flex items-center justify-between px-4 mb-2">
         <button
           onClick={onBack}
-          className="text-xs text-slate-400 hover:text-white flex items-center space-x-1 font-mono uppercase tracking-wider"
+          className="text-[10px] text-slate-400 hover:text-slate-900 flex items-center space-x-1 font-bold uppercase tracking-widest transition-colors"
           id="btn-bracket-back"
         >
           <RotateCcw className="w-3.5 h-3.5" />
           <span>Exit Game</span>
         </button>
         <div className="flex flex-col items-end">
-          <span className="text-[10px] uppercase font-mono font-bold text-amber-500 tracking-widest bg-amber-500/10 px-2 py-0.5 rounded-full mb-1">
+          <span className="text-[10px] uppercase font-bold text-slate-900 tracking-widest bg-slate-100 px-3 py-1 rounded-full mb-1">
             {getRoundName()}
           </span>
-          <span className="text-xs text-slate-400 font-mono">
+          <span className="text-[10px] text-slate-400 uppercase font-bold tracking-widest">
             Match {currentMatchNum} of {totalMatchesNum}
           </span>
         </div>
@@ -111,22 +111,21 @@ export default function FlavorBracket({ onComplete, onBack }: FlavorBracketProps
                 type="button"
                 onClick={() => handleSelectWinner(contestantA)}
                 id={`btn-bracket-contestant-${contestantA.id}`}
-                className="w-full p-6 text-left rounded-2xl border border-slate-800 hover:border-amber-500/50 hover:scale-[1.02] active:scale-[0.99] transition-all duration-200 shadow-xl flex flex-col justify-between h-[150px] relative overflow-hidden group"
-                style={{ background: contestantA.image }}
+                className="w-full p-6 text-left rounded-3xl border border-slate-200 bg-white hover:border-slate-900 hover:shadow-xl hover:scale-[1.02] active:scale-[0.99] transition-all duration-200 shadow-sm flex flex-col justify-between h-[160px] relative overflow-hidden group"
               >
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/20 to-transparent"></div>
+                <div className="absolute inset-0 opacity-10 mix-blend-multiply" style={{ background: contestantA.image }}></div>
                 <div className="relative z-10 flex flex-col h-full justify-between w-full">
                   <div className="flex justify-between items-center w-full">
-                    <span className="text-[10px] font-mono tracking-widest uppercase text-white/70 font-bold bg-white/10 px-2 py-0.5 rounded">
+                    <span className="text-[10px] uppercase text-slate-400 font-bold tracking-widest">
                       Option A
                     </span>
-                    <Trophy className="w-4 h-4 text-white/50 group-hover:text-amber-400 transition-colors" />
+                    <Trophy className="w-4 h-4 text-slate-300 group-hover:text-slate-900 transition-colors" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-white tracking-tight leading-snug drop-shadow-md">
+                    <h3 className="text-2xl font-bold text-slate-900 tracking-tight leading-snug drop-shadow-sm">
                       {contestantA.title}
                     </h3>
-                    <p className="text-xs text-white/80 font-mono mt-1 font-semibold drop-shadow-sm flex items-center space-x-1">
+                    <p className="text-[10px] text-slate-500 uppercase tracking-widest mt-2 font-bold flex items-center space-x-1">
                       <span>Tap to select</span>
                       <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
                     </p>
@@ -135,12 +134,12 @@ export default function FlavorBracket({ onComplete, onBack }: FlavorBracketProps
               </button>
 
               {/* VS Divider */}
-              <div className="flex items-center justify-center space-x-4 py-1">
-                <div className="flex-grow border-t border-slate-800/80"></div>
-                <div className="bg-slate-950 border border-slate-800 w-9 h-9 rounded-full flex items-center justify-center shadow-md">
-                  <Swords className="w-4 h-4 text-amber-500" />
+              <div className="flex items-center justify-center space-x-4 py-2">
+                <div className="flex-grow border-t border-slate-100"></div>
+                <div className="bg-white border border-slate-200 w-10 h-10 rounded-full flex items-center justify-center shadow-sm">
+                  <Swords className="w-4 h-4 text-slate-400" />
                 </div>
-                <div className="flex-grow border-t border-slate-800/80"></div>
+                <div className="flex-grow border-t border-slate-100"></div>
               </div>
 
               {/* Contestant B */}
@@ -148,22 +147,21 @@ export default function FlavorBracket({ onComplete, onBack }: FlavorBracketProps
                 type="button"
                 onClick={() => handleSelectWinner(contestantB)}
                 id={`btn-bracket-contestant-${contestantB.id}`}
-                className="w-full p-6 text-left rounded-2xl border border-slate-800 hover:border-amber-500/50 hover:scale-[1.02] active:scale-[0.99] transition-all duration-200 shadow-xl flex flex-col justify-between h-[150px] relative overflow-hidden group"
-                style={{ background: contestantB.image }}
+                className="w-full p-6 text-left rounded-3xl border border-slate-200 bg-white hover:border-slate-900 hover:shadow-xl hover:scale-[1.02] active:scale-[0.99] transition-all duration-200 shadow-sm flex flex-col justify-between h-[160px] relative overflow-hidden group"
               >
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/20 to-transparent"></div>
+                <div className="absolute inset-0 opacity-10 mix-blend-multiply" style={{ background: contestantB.image }}></div>
                 <div className="relative z-10 flex flex-col h-full justify-between w-full">
                   <div className="flex justify-between items-center w-full">
-                    <span className="text-[10px] font-mono tracking-widest uppercase text-white/70 font-bold bg-white/10 px-2 py-0.5 rounded">
+                    <span className="text-[10px] uppercase text-slate-400 font-bold tracking-widest">
                       Option B
                     </span>
-                    <Trophy className="w-4 h-4 text-white/50 group-hover:text-amber-400 transition-colors" />
+                    <Trophy className="w-4 h-4 text-slate-300 group-hover:text-slate-900 transition-colors" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-white tracking-tight leading-snug drop-shadow-md">
+                    <h3 className="text-2xl font-bold text-slate-900 tracking-tight leading-snug drop-shadow-sm">
                       {contestantB.title}
                     </h3>
-                    <p className="text-xs text-white/80 font-mono mt-1 font-semibold drop-shadow-sm flex items-center space-x-1">
+                    <p className="text-[10px] text-slate-500 uppercase tracking-widest mt-2 font-bold flex items-center space-x-1">
                       <span>Tap to select</span>
                       <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
                     </p>
@@ -178,12 +176,12 @@ export default function FlavorBracket({ onComplete, onBack }: FlavorBracketProps
               className="text-center flex flex-col items-center justify-center space-y-4"
               id="bracket-completed-spinner"
             >
-              <div className="p-4 bg-amber-500/10 text-amber-400 rounded-full animate-pulse border border-amber-500/20">
+              <div className="p-4 bg-slate-100 text-slate-900 rounded-full animate-pulse border border-slate-200">
                 <Trophy className="w-8 h-8" />
               </div>
               <div>
-                <h4 className="text-lg font-bold text-white">Cuisine Champion Found!</h4>
-                <p className="text-xs text-slate-400 max-w-[240px] mx-auto mt-1">
+                <h4 className="text-2xl font-bold text-slate-900">Cuisine Champion Found!</h4>
+                <p className="text-sm text-slate-500 max-w-[240px] mx-auto mt-2 italic">
                   Searching Google Maps for the best local spots for your bracket champion...
                 </p>
               </div>
@@ -196,7 +194,7 @@ export default function FlavorBracket({ onComplete, onBack }: FlavorBracketProps
       <div className="w-full flex justify-center pt-2">
         <button
           onClick={handleReset}
-          className="text-xs text-slate-500 hover:text-slate-300 flex items-center space-x-1 bg-slate-950 px-3 py-1.5 rounded-full border border-slate-900 transition-colors font-mono"
+          className="text-[10px] uppercase font-bold tracking-widest text-slate-500 hover:text-slate-900 flex items-center space-x-1 bg-white px-4 py-2 rounded-full border border-slate-200 shadow-sm transition-colors"
           id="btn-bracket-restart"
         >
           <RotateCcw className="w-3 h-3" />

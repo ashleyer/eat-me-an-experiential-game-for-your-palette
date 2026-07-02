@@ -98,18 +98,18 @@ export default function FoodOracleChat({
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: 100 }}
           transition={{ type: "spring", damping: 25, stiffness: 200 }}
-          className="fixed inset-y-0 right-0 w-full max-w-md bg-slate-950 border-l border-slate-800 shadow-2xl z-40 flex flex-col h-screen text-slate-100"
+          className="fixed inset-y-0 right-0 w-full max-w-md bg-white border-l border-slate-200 shadow-2xl z-40 flex flex-col h-screen text-slate-800"
           id="food-oracle-chat-drawer"
         >
           {/* Drawer Header */}
-          <div className="p-4 border-b border-slate-800 bg-slate-900 flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <div className="p-1.5 bg-amber-500/10 text-amber-400 rounded-lg">
+          <div className="p-6 border-b border-slate-100 bg-white flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-slate-100 text-slate-900 rounded-full">
                 <Sparkles className="w-5 h-5 animate-pulse" />
               </div>
               <div>
-                <h3 className="font-bold text-white text-sm">Consult the Food Oracle</h3>
-                <p className="text-[10px] text-emerald-400 flex items-center space-x-1">
+                <h3 className="font-bold text-slate-900 text-sm">Consult the Oracle</h3>
+                <p className="text-[10px] text-emerald-600 flex items-center space-x-1 uppercase font-bold tracking-wider mt-0.5">
                   <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full inline-block animate-ping"></span>
                   <span>Grounding via Google Search</span>
                 </p>
@@ -118,27 +118,27 @@ export default function FoodOracleChat({
             <button
               onClick={onClose}
               id="btn-close-chat"
-              className="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors"
+              className="p-2 hover:bg-slate-100 rounded-full text-slate-400 hover:text-slate-900 transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
           {/* Chat Messages */}
-          <div className="flex-grow overflow-y-auto p-4 space-y-4" id="chat-messages-container">
+          <div className="flex-grow overflow-y-auto p-6 space-y-6" id="chat-messages-container">
             {messages.map((msg, index) => (
               <div
                 key={index}
                 className={`flex flex-col ${msg.role === "user" ? "items-end" : "items-start"}`}
               >
-                <div className={`text-[10px] font-mono mb-1 text-slate-500 ${msg.role === "user" ? "mr-1" : "ml-1"}`}>
+                <div className={`text-[10px] font-bold uppercase tracking-widest mb-1 text-slate-400 ${msg.role === "user" ? "mr-1" : "ml-1"}`}>
                   {msg.role === "user" ? "You" : "Food Oracle"}
                 </div>
                 <div
-                  className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed shadow ${
+                  className={`max-w-[85%] rounded-3xl px-5 py-3 text-sm leading-relaxed ${
                     msg.role === "user"
-                      ? "bg-amber-500 text-slate-950 font-medium rounded-tr-none"
-                      : "bg-slate-900 text-slate-100 rounded-tl-none border border-slate-800"
+                      ? "bg-slate-900 text-white font-medium rounded-tr-none shadow-md"
+                      : "bg-slate-50 text-slate-700 rounded-tl-none border border-slate-100"
                   }`}
                 >
                   <div className="markdown-body">
@@ -149,11 +149,11 @@ export default function FoodOracleChat({
             ))}
             {isLoading && (
               <div className="flex flex-col items-start" id="chat-loading-indicator">
-                <span className="text-[10px] font-mono mb-1 text-slate-500 ml-1">Food Oracle</span>
-                <div className="bg-slate-900 border border-slate-800 rounded-2xl rounded-tl-none px-4 py-3 shadow flex items-center space-x-1.5">
-                  <span className="w-2 h-2 bg-amber-500 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></span>
-                  <span className="w-2 h-2 bg-amber-500 rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></span>
-                  <span className="w-2 h-2 bg-amber-500 rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></span>
+                <span className="text-[10px] font-bold uppercase tracking-widest mb-1 text-slate-400 ml-1">Food Oracle</span>
+                <div className="bg-slate-50 border border-slate-100 rounded-3xl rounded-tl-none px-5 py-4 flex items-center space-x-1.5">
+                  <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></span>
+                  <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></span>
+                  <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></span>
                 </div>
               </div>
             )}
@@ -163,23 +163,23 @@ export default function FoodOracleChat({
           {/* Input Form */}
           <form
             onSubmit={handleSendMessage}
-            className="p-4 border-t border-slate-800 bg-slate-900/50 flex items-center space-x-2"
+            className="p-6 border-t border-slate-100 bg-white flex items-center space-x-3"
             id="chat-input-form"
           >
             <input
               type="text"
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
-              placeholder="e.g., Which has veggie options? Is there parking?"
+              placeholder="Ask about these places..."
               disabled={isLoading}
               id="input-chat-message"
-              className="flex-grow bg-slate-950 border border-slate-800 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-500 outline-none transition-all"
+              className="flex-grow bg-slate-50 border border-slate-200 focus:border-slate-900 focus:ring-1 focus:ring-slate-900 focus:bg-white rounded-full px-5 py-3 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all font-medium"
             />
             <button
               type="submit"
               disabled={!inputText.trim() || isLoading}
               id="btn-send-chat"
-              className="p-2.5 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 disabled:hover:bg-amber-500 text-slate-950 rounded-xl transition-all shadow-md"
+              className="p-3.5 bg-slate-900 hover:bg-slate-800 disabled:opacity-50 disabled:hover:bg-slate-900 text-white rounded-full transition-all shadow-md active:scale-95 flex-shrink-0"
             >
               <Send className="w-4 h-4" />
             </button>

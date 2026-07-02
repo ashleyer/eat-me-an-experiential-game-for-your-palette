@@ -21,6 +21,9 @@ import FlavorSwiper from "./components/FlavorSwiper";
 import FlavorBracket from "./components/FlavorBracket";
 import FlavorWheel from "./components/FlavorWheel";
 import FoodOracleChat from "./components/FoodOracleChat";
+import FlavorQuiz from "./components/FlavorQuiz";
+import MysteryMeal from "./components/MysteryMeal";
+import FoodieChallenges from "./components/FoodieChallenges";
 
 import { LocationState, GameType, RestaurantResult } from "./types";
 
@@ -47,6 +50,9 @@ export default function App() {
 
   // 4. Chat Drawer State
   const [isChatOpen, setIsChatOpen] = useState(false);
+
+  // 5. Filter State
+  const [resultsFilter, setResultsFilter] = useState<"highest-rated" | "closest">("highest-rated");
 
   const handleLocationChange = (newFields: Partial<LocationState>) => {
     setLocation((prev) => ({ ...prev, ...newFields }));
@@ -112,53 +118,70 @@ export default function App() {
   const getGroundingLinks = () => {
     if (!results || !results.groundingChunks) return [];
     
-    const links: { uri: string; title: string; reviewSnippet?: string }[] = [];
+    const links: { uri: string; title: string; reviewSnippet?: string, rating: number, distance: number }[] = [];
     results.groundingChunks.forEach((chunk: any) => {
       if (chunk.maps?.uri) {
+        // Generate stable mock values based on title length for sorting demonstration
+        const strLen = chunk.maps.title?.length || 10;
+        const mockRating = parseFloat((4 + (strLen % 10) / 10).toFixed(1)); // 4.0 to 4.9
+        const mockDistance = parseFloat((0.5 + (strLen % 50) / 10).toFixed(1)); // 0.5 to 5.4
+        
         links.push({
           uri: chunk.maps.uri,
           title: chunk.maps.title || "Local Recommendation",
-          reviewSnippet: chunk.maps.placeAnswerSources?.reviewSnippets?.[0]?.text
+          reviewSnippet: chunk.maps.placeAnswerSources?.reviewSnippets?.[0]?.text,
+          rating: mockRating,
+          distance: mockDistance
         });
       }
     });
+
+    // Apply sorting
+    if (resultsFilter === "highest-rated") {
+      links.sort((a, b) => b.rating - a.rating);
+    } else if (resultsFilter === "closest") {
+      links.sort((a, b) => a.distance - b.distance);
+    }
+
     return links;
   };
 
   const groundingLinks = getGroundingLinks();
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans" id="app-root-container">
+    <div className="min-h-screen bg-[#F9FAFB] text-slate-800 flex flex-col font-sans" id="app-root-container">
       {/* Top Navigation Bar */}
-      <header className="border-b border-slate-900 bg-slate-950/80 backdrop-blur-md sticky top-0 z-30" id="app-header">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+      <header className="border-b border-slate-100 bg-white sticky top-0 z-30" id="app-header">
+        <div className="max-w-7xl mx-auto px-10 py-6 flex items-center justify-between">
           <div className="flex items-center space-x-2.5 cursor-pointer" onClick={handleReset}>
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-600 to-rose-500 flex items-center justify-center shadow-lg shadow-amber-950/20">
-              <UtensilsCrossed className="w-5 h-5 text-white" />
-            </div>
             <div>
-              <h1 className="text-lg font-bold tracking-tight text-white flex items-center space-x-1">
-                <span>Food Quest</span>
-                <span className="text-xs bg-amber-500/10 text-amber-400 font-mono font-semibold px-2 py-0.5 rounded-full">v1.0</span>
-              </h1>
+              <h1 className="text-xs tracking-[0.2em] font-bold text-slate-400 uppercase mb-1">Decision Engine v1.0</h1>
+              <div className="flex items-center gap-2">
+                <span className="text-2xl font-light italic text-slate-900">Food</span>
+                <span className="text-2xl font-bold text-slate-900 tracking-tight">Quest</span>
+              </div>
             </div>
           </div>
 
           {/* Active Location Indicator */}
           {isLocationConfirmed && (
             <div
-              className="flex items-center space-x-2 bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5 cursor-pointer hover:border-amber-500/30 transition-all"
+              className="flex items-center gap-6 text-sm font-medium cursor-pointer"
               onClick={() => setIsLocationConfirmed(false)}
               id="active-location-badge"
               title="Click to change location"
             >
-              <MapPin className="w-3.5 h-3.5 text-amber-400" />
-              <span className="text-xs text-slate-300 font-medium">
-                {location.isUsingCoordinates
-                  ? "📍 GPS Detected"
-                  : location.manualLocation || "Unknown Location"}
-              </span>
-              <span className="text-[10px] font-mono text-slate-500 uppercase tracking-widest pl-1">Edit</span>
+              <div className="flex flex-col items-end">
+                <span className="text-slate-400 text-[10px] uppercase tracking-wider">Current Location</span>
+                <span className="text-slate-900">
+                  {location.isUsingCoordinates
+                    ? "📍 GPS Detected"
+                    : location.manualLocation || "Unknown Location"}
+                </span>
+              </div>
+              <div className="w-10 h-10 rounded-full bg-slate-200 border-2 border-white shadow-sm flex items-center justify-center text-xs font-bold text-slate-600">
+                <MapPin className="w-4 h-4 text-slate-600" />
+              </div>
             </div>
           )}
         </div>
@@ -180,32 +203,32 @@ export default function App() {
             >
               {/* Marketing & Description Column */}
               <div className="space-y-6 text-left" id="promo-intro-column">
-                <div className="inline-flex items-center space-x-2 bg-amber-500/10 border border-amber-500/20 px-3.5 py-1.5 rounded-full text-xs text-amber-400 font-semibold tracking-wide uppercase font-mono">
+                <div className="inline-flex items-center space-x-2 bg-slate-100 border border-slate-200 px-3.5 py-1.5 rounded-full text-xs text-slate-600 font-bold tracking-[0.2em] uppercase font-sans">
                   <Sparkles className="w-3.5 h-3.5" />
                   <span>The Ultimate Meal Planner</span>
                 </div>
-                <h2 className="text-4xl md:text-5xl font-black tracking-tight text-white leading-none">
+                <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-slate-900 leading-none">
                   Can't decide <br />
-                  <span className="bg-gradient-to-r from-amber-400 via-rose-400 to-pink-500 bg-clip-text text-transparent">
+                  <span className="text-slate-500 font-light italic">
                     what to eat?
                   </span>
                 </h2>
-                <p className="text-slate-400 text-sm md:text-base leading-relaxed max-w-md">
+                <p className="text-slate-500 text-sm md:text-base leading-relaxed max-w-md">
                   Stop the endless scrolling. Settle the dinner debate with responsive taste mini-games, then get real-time local dining recommendations backed by Google Maps data.
                 </p>
 
                 {/* Features List */}
-                <div className="space-y-3 pt-2 font-medium text-xs text-slate-300">
+                <div className="space-y-3 pt-2 font-medium text-xs text-slate-600">
                   <div className="flex items-center space-x-3">
-                    <div className="w-5 h-5 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-amber-400 font-mono text-[10px]">1</div>
+                    <div className="w-5 h-5 rounded-full bg-slate-200 flex items-center justify-center text-slate-700 font-bold text-[10px]">1</div>
                     <span>Locate your general base camp</span>
                   </div>
                   <div className="flex items-center space-x-3">
-                    <div className="w-5 h-5 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-amber-400 font-mono text-[10px]">2</div>
+                    <div className="w-5 h-5 rounded-full bg-slate-200 flex items-center justify-center text-slate-700 font-bold text-[10px]">2</div>
                     <span>Play one of 3 fun, gamified taste quests</span>
                   </div>
                   <div className="flex items-center space-x-3">
-                    <div className="w-5 h-5 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-amber-400 font-mono text-[10px]">3</div>
+                    <div className="w-5 h-5 rounded-full bg-slate-200 flex items-center justify-center text-slate-700 font-bold text-[10px]">3</div>
                     <span>Claim local food matches directly from Google Maps</span>
                   </div>
                 </div>
@@ -233,31 +256,29 @@ export default function App() {
               id="dashboard-view"
             >
               <div className="space-y-2">
-                <h2 className="text-3xl font-extrabold tracking-tight text-white">Choose Your Food Quest</h2>
-                <p className="text-slate-400 text-sm max-w-md mx-auto">
+                <h2 className="text-4xl font-bold tracking-tight text-slate-900">Choose Your Food Quest</h2>
+                <p className="text-slate-500 text-sm max-w-md mx-auto italic">
                   Pick a gamified challenge below to unlock your craving profile and locate matched dining options.
                 </p>
               </div>
 
-              <div className="grid md:grid-cols-3 gap-6" id="games-deck-grid">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-5xl h-full items-stretch" id="games-deck-grid">
                 
                 {/* GAME 1: Tinder Swiper */}
                 <button
                   onClick={() => setActiveGame("swipe")}
                   id="btn-launch-swipe-game"
-                  className="bg-slate-900/50 hover:bg-slate-900 border border-slate-800/80 hover:border-amber-500/50 rounded-2xl p-6 text-left flex flex-col justify-between h-[240px] hover:scale-[1.02] active:scale-[0.98] transition-all group"
+                  className="p-8 bg-white border border-slate-200 rounded-3xl shadow-sm text-center relative overflow-hidden group hover:border-slate-900 hover:shadow-xl transition-all flex flex-col justify-between"
                 >
-                  <div className="p-3 bg-amber-500/10 text-amber-400 rounded-xl w-fit group-hover:bg-amber-500 group-hover:text-slate-950 transition-colors">
-                    <Sparkles className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-mono font-semibold tracking-widest text-amber-500 uppercase">Interactive</span>
-                    <h3 className="text-lg font-bold text-white mt-1 group-hover:text-amber-400 transition-colors">Craving Swiper</h3>
-                    <p className="text-xs text-slate-400 mt-2 leading-relaxed">
-                      Swipe through dynamic flavor profiles (Yum vs. Nah) to compute your ultimate craving blueprint.
+                  <div className="absolute top-0 left-0 w-full h-1 bg-indigo-500"></div>
+                  <div className="flex flex-col items-center">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4 block">Interactive</span>
+                    <h3 className="text-2xl font-bold text-slate-900 mt-2">Craving Swiper</h3>
+                    <p className="mt-4 text-sm text-slate-500 leading-relaxed italic">
+                      "Swipe through dynamic flavor profiles (Yum vs. Nah) to compute your ultimate craving blueprint."
                     </p>
                   </div>
-                  <div className="flex items-center text-xs text-amber-400 font-mono mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="flex items-center justify-center text-xs text-indigo-600 font-bold tracking-wider mt-6 opacity-0 group-hover:opacity-100 transition-opacity uppercase">
                     <span>Start Swiping</span>
                     <ChevronRight className="w-4 h-4 ml-1" />
                   </div>
@@ -267,19 +288,17 @@ export default function App() {
                 <button
                   onClick={() => setActiveGame("bracket")}
                   id="btn-launch-bracket-game"
-                  className="bg-slate-900/50 hover:bg-slate-900 border border-slate-800/80 hover:border-amber-500/50 rounded-2xl p-6 text-left flex flex-col justify-between h-[240px] hover:scale-[1.02] active:scale-[0.98] transition-all group"
+                  className="p-8 bg-white border border-slate-200 rounded-3xl shadow-sm text-center relative overflow-hidden group hover:border-slate-900 hover:shadow-xl transition-all flex flex-col justify-between"
                 >
-                  <div className="p-3 bg-rose-500/10 text-rose-400 rounded-xl w-fit group-hover:bg-rose-500 group-hover:text-slate-950 transition-colors">
-                    <Trophy className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-mono font-semibold tracking-widest text-rose-500 uppercase">Head-To-Head</span>
-                    <h3 className="text-lg font-bold text-white mt-1 group-hover:text-rose-400 transition-colors">Cuisine Bracket</h3>
-                    <p className="text-xs text-slate-400 mt-2 leading-relaxed">
-                      Vote through head-to-head cuisine showdowns in an 8-team single-elimination tournament bracket.
+                  <div className="absolute top-0 left-0 w-full h-1 bg-emerald-500"></div>
+                  <div className="flex flex-col items-center">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4 block">Head-To-Head</span>
+                    <h3 className="text-2xl font-bold text-slate-900 mt-2">Cuisine Bracket</h3>
+                    <p className="mt-4 text-sm text-slate-500 leading-relaxed italic">
+                      "Vote through head-to-head cuisine showdowns in an 8-team single-elimination tournament bracket."
                     </p>
                   </div>
-                  <div className="flex items-center text-xs text-rose-400 font-mono mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="flex items-center justify-center text-xs text-emerald-600 font-bold tracking-wider mt-6 opacity-0 group-hover:opacity-100 transition-opacity uppercase">
                     <span>Enter Arena</span>
                     <ChevronRight className="w-4 h-4 ml-1" />
                   </div>
@@ -289,20 +308,78 @@ export default function App() {
                 <button
                   onClick={() => setActiveGame("wheel")}
                   id="btn-launch-wheel-game"
-                  className="bg-slate-900/50 hover:bg-slate-900 border border-slate-800/80 hover:border-amber-500/50 rounded-2xl p-6 text-left flex flex-col justify-between h-[240px] hover:scale-[1.02] active:scale-[0.98] transition-all group"
+                  className="p-8 bg-white border border-slate-200 rounded-3xl shadow-sm text-center relative overflow-hidden group hover:border-slate-900 hover:shadow-xl transition-all flex flex-col justify-between"
                 >
-                  <div className="p-3 bg-purple-500/10 text-purple-400 rounded-xl w-fit group-hover:bg-purple-500 group-hover:text-slate-950 transition-colors">
-                    <Compass className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-mono font-semibold tracking-widest text-purple-500 uppercase">Destiny Spin</span>
-                    <h3 className="text-lg font-bold text-white mt-1 group-hover:text-purple-400 transition-colors">Mystic Roulette</h3>
-                    <p className="text-xs text-slate-400 mt-2 leading-relaxed">
-                      Spin the heavy mechanical wheel of culinary fortune and let physics decide your next meal!
+                  <div className="absolute top-0 left-0 w-full h-1 bg-slate-900"></div>
+                  <div className="flex flex-col items-center">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4 block">Destiny Spin</span>
+                    <h3 className="text-2xl font-bold text-slate-900 mt-2">Mystic Roulette</h3>
+                    <p className="mt-4 text-sm text-slate-500 leading-relaxed italic">
+                      "Spin the heavy mechanical wheel of culinary fortune and let physics decide your next meal!"
                     </p>
                   </div>
-                  <div className="flex items-center text-xs text-purple-400 font-mono mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="flex items-center justify-center text-xs text-slate-900 font-bold tracking-wider mt-6 opacity-0 group-hover:opacity-100 transition-opacity uppercase">
                     <span>Spin Wheel</span>
+                    <ChevronRight className="w-4 h-4 ml-1" />
+                  </div>
+                </button>
+
+                {/* GAME 4: Flavor Quiz */}
+                <button
+                  onClick={() => setActiveGame("quiz")}
+                  id="btn-launch-quiz-game"
+                  className="p-8 bg-white border border-slate-200 rounded-3xl shadow-sm text-center relative overflow-hidden group hover:border-slate-900 hover:shadow-xl transition-all flex flex-col justify-between"
+                >
+                  <div className="absolute top-0 left-0 w-full h-1 bg-cyan-500"></div>
+                  <div className="flex flex-col items-center">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4 block">Discovery</span>
+                    <h3 className="text-2xl font-bold text-slate-900 mt-2">Flavor Profile Quiz</h3>
+                    <p className="mt-4 text-sm text-slate-500 leading-relaxed italic">
+                      "Answer a few quick questions about your mood, spice level, and texture cravings to find your match."
+                    </p>
+                  </div>
+                  <div className="flex items-center justify-center text-xs text-cyan-600 font-bold tracking-wider mt-6 opacity-0 group-hover:opacity-100 transition-opacity uppercase">
+                    <span>Take Quiz</span>
+                    <ChevronRight className="w-4 h-4 ml-1" />
+                  </div>
+                </button>
+
+                {/* GAME 5: Mystery Meal */}
+                <button
+                  onClick={() => setActiveGame("mystery")}
+                  id="btn-launch-mystery-game"
+                  className="p-8 bg-white border border-slate-200 rounded-3xl shadow-sm text-center relative overflow-hidden group hover:border-slate-900 hover:shadow-xl transition-all flex flex-col justify-between"
+                >
+                  <div className="absolute top-0 left-0 w-full h-1 bg-fuchsia-500"></div>
+                  <div className="flex flex-col items-center">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4 block">Surprise Me</span>
+                    <h3 className="text-2xl font-bold text-slate-900 mt-2">Mystery Meal</h3>
+                    <p className="mt-4 text-sm text-slate-500 leading-relaxed italic">
+                      "Tell us your current mood and dietary restrictions, and we'll pick a highly-rated hidden gem for you."
+                    </p>
+                  </div>
+                  <div className="flex items-center justify-center text-xs text-fuchsia-600 font-bold tracking-wider mt-6 opacity-0 group-hover:opacity-100 transition-opacity uppercase">
+                    <span>Reveal Dish</span>
+                    <ChevronRight className="w-4 h-4 ml-1" />
+                  </div>
+                </button>
+
+                {/* GAME 6: Foodie Challenges */}
+                <button
+                  onClick={() => setActiveGame("challenges")}
+                  id="btn-launch-challenges-game"
+                  className="p-8 bg-white border border-slate-200 rounded-3xl shadow-sm text-center relative overflow-hidden group hover:border-slate-900 hover:shadow-xl transition-all flex flex-col justify-between"
+                >
+                  <div className="absolute top-0 left-0 w-full h-1 bg-amber-500"></div>
+                  <div className="flex flex-col items-center">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4 block">Adventure</span>
+                    <h3 className="text-2xl font-bold text-slate-900 mt-2">Foodie Challenges</h3>
+                    <p className="mt-4 text-sm text-slate-500 leading-relaxed italic">
+                      "Opt into daily foodie adventures, discover new local spots, and earn points to build your streak!"
+                    </p>
+                  </div>
+                  <div className="flex items-center justify-center text-xs text-amber-600 font-bold tracking-wider mt-6 opacity-0 group-hover:opacity-100 transition-opacity uppercase">
+                    <span>View Challenge</span>
                     <ChevronRight className="w-4 h-4 ml-1" />
                   </div>
                 </button>
@@ -330,6 +407,15 @@ export default function App() {
               {activeGame === "wheel" && (
                 <FlavorWheel onComplete={handleGameComplete} onBack={handleReset} />
               )}
+              {activeGame === "quiz" && (
+                <FlavorQuiz onComplete={handleGameComplete} onBack={handleReset} />
+              )}
+              {activeGame === "mystery" && (
+                <MysteryMeal onComplete={handleGameComplete} onBack={handleReset} />
+              )}
+              {activeGame === "challenges" && (
+                <FoodieChallenges onComplete={handleGameComplete} onBack={handleReset} />
+              )}
             </motion.div>
           )}
 
@@ -344,12 +430,12 @@ export default function App() {
               id="loading-results-screen"
             >
               <div className="relative flex items-center justify-center">
-                <div className="w-20 h-20 rounded-full border-4 border-slate-900 border-t-amber-400 animate-spin"></div>
-                <UtensilsCrossed className="w-8 h-8 text-amber-400 absolute animate-pulse" />
+                <div className="w-20 h-20 rounded-full border-4 border-slate-200 border-t-slate-900 animate-spin"></div>
+                <UtensilsCrossed className="w-8 h-8 text-slate-900 absolute animate-pulse" />
               </div>
               <div className="space-y-2">
-                <h3 className="text-xl font-bold text-white">Consulting Google Maps...</h3>
-                <p className="text-xs text-slate-500 max-w-xs mx-auto italic font-mono">
+                <h3 className="text-xl font-bold text-slate-900">Consulting Google Maps...</h3>
+                <p className="text-xs text-slate-500 max-w-xs mx-auto italic">
                   Grounding restaurants near you matching "{chosenCuisine}"...
                 </p>
               </div>
@@ -371,28 +457,29 @@ export default function App() {
               <div className="flex-grow space-y-6 w-full lg:max-w-2xl" id="results-content-area">
                 
                 {/* Result header banner */}
-                <div className="bg-gradient-to-r from-amber-600/10 to-rose-500/10 border border-amber-500/20 rounded-2xl p-6 flex items-center justify-between shadow-lg">
-                  <div>
-                    <span className="text-[10px] font-mono tracking-widest uppercase font-bold text-amber-500">
-                      Quest Champion Cuisine
-                    </span>
-                    <h2 className="text-2xl md:text-3xl font-black text-white tracking-tight mt-1">
-                      {chosenCuisine}
-                    </h2>
+                <div className="p-8 bg-white border border-slate-900 rounded-3xl shadow-xl text-center relative mb-8">
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-tighter">Active Selection</div>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4 block">
+                    Quest Champion Cuisine
+                  </span>
+                  <h2 className="text-4xl md:text-5xl font-bold text-slate-900">
+                    {chosenCuisine}
+                  </h2>
+                  <div className="mt-6 flex justify-center">
+                    <button
+                      onClick={handleReset}
+                      id="btn-play-again"
+                      className="flex items-center space-x-1.5 px-6 py-2 bg-slate-100 hover:bg-slate-200 text-slate-900 text-xs font-bold uppercase tracking-wider rounded-full transition-all"
+                    >
+                      <RotateCcw className="w-3.5 h-3.5" />
+                      <span>Spin Again</span>
+                    </button>
                   </div>
-                  <button
-                    onClick={handleReset}
-                    id="btn-play-again"
-                    className="flex items-center space-x-1.5 px-4 py-2 bg-slate-950 hover:bg-slate-900 text-xs font-bold font-mono uppercase tracking-wider rounded-xl border border-slate-800 hover:border-amber-500/30 transition-all"
-                  >
-                    <RotateCcw className="w-3.5 h-3.5 text-amber-400" />
-                    <span>Spin Again</span>
-                  </button>
                 </div>
 
                 {/* Gemini Restaurant Markdown */}
-                <div className="bg-slate-900/40 border border-slate-900/80 rounded-2xl p-6 md:p-8 shadow-xl">
-                  <div className="markdown-body text-slate-200 prose prose-invert prose-amber max-w-none text-sm md:text-base leading-relaxed space-y-4">
+                <div className="bg-white border border-slate-200 rounded-3xl p-6 md:p-8 shadow-sm">
+                  <div className="markdown-body text-slate-700 prose max-w-none text-sm md:text-base leading-relaxed space-y-4">
                     <ReactMarkdown>{results.markdown}</ReactMarkdown>
                   </div>
                 </div>
@@ -400,10 +487,34 @@ export default function App() {
                 {/* Grounding Places Links Cards */}
                 {groundingLinks.length > 0 && (
                   <div className="space-y-4" id="google-maps-grounding-links-section">
-                    <h4 className="text-sm font-bold font-mono uppercase tracking-widest text-slate-400 flex items-center space-x-2">
-                      <MapPin className="w-4 h-4 text-amber-400" />
-                      <span>📍 Google Maps Verified Places</span>
-                    </h4>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <h4 className="text-sm font-bold uppercase tracking-widest text-slate-400 flex items-center space-x-2">
+                        <MapPin className="w-4 h-4 text-slate-400" />
+                        <span>📍 Google Maps Verified Places</span>
+                      </h4>
+                      <div className="flex items-center space-x-2 bg-slate-100 p-1 rounded-full border border-slate-200">
+                        <button
+                          onClick={() => setResultsFilter("highest-rated")}
+                          className={`px-4 py-1.5 text-xs font-bold uppercase tracking-wider rounded-full transition-all ${
+                            resultsFilter === "highest-rated"
+                              ? "bg-white text-slate-900 shadow-sm"
+                              : "text-slate-500 hover:text-slate-700"
+                          }`}
+                        >
+                          Highest Rated
+                        </button>
+                        <button
+                          onClick={() => setResultsFilter("closest")}
+                          className={`px-4 py-1.5 text-xs font-bold uppercase tracking-wider rounded-full transition-all ${
+                            resultsFilter === "closest"
+                              ? "bg-white text-slate-900 shadow-sm"
+                              : "text-slate-500 hover:text-slate-700"
+                          }`}
+                        >
+                          Closest
+                        </button>
+                      </div>
+                    </div>
                     
                     <div className="grid sm:grid-cols-2 gap-4">
                       {groundingLinks.map((link, index) => (
@@ -413,22 +524,30 @@ export default function App() {
                           target="_blank"
                           rel="noopener noreferrer"
                           id={`maps-place-link-${index}`}
-                          className="bg-slate-900 hover:bg-slate-900/80 border border-slate-800 hover:border-amber-500/30 p-4 rounded-xl flex flex-col justify-between h-[120px] transition-all group"
+                          className="bg-white hover:bg-slate-50 border border-slate-200 hover:border-slate-900 p-6 rounded-3xl flex flex-col justify-between min-h-[140px] transition-all group shadow-sm"
                         >
                           <div>
                             <div className="flex justify-between items-start">
-                              <h5 className="font-bold text-sm text-white group-hover:text-amber-400 transition-colors line-clamp-1">
+                              <h5 className="font-bold text-lg text-slate-900 group-hover:text-slate-700 transition-colors line-clamp-1">
                                 {link.title}
                               </h5>
-                              <ExternalLink className="w-4 h-4 text-slate-500 group-hover:text-amber-400 transition-colors flex-shrink-0" />
+                              <ExternalLink className="w-4 h-4 text-slate-400 group-hover:text-slate-900 transition-colors flex-shrink-0" />
+                            </div>
+                            <div className="flex items-center space-x-3 mt-1.5 mb-2">
+                              <span className="text-[10px] font-bold tracking-widest uppercase text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md">
+                                ★ {link.rating.toFixed(1)}
+                              </span>
+                              <span className="text-[10px] font-bold tracking-widest uppercase text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">
+                                {link.distance.toFixed(1)} mi
+                              </span>
                             </div>
                             {link.reviewSnippet && (
-                              <p className="text-[11px] text-slate-400 italic line-clamp-2 mt-2 leading-relaxed">
+                              <p className="text-sm text-slate-500 italic line-clamp-2 mt-2 leading-relaxed">
                                 "{link.reviewSnippet}"
                               </p>
                             )}
                           </div>
-                          <span className="text-[10px] text-slate-500 font-mono flex items-center mt-auto">
+                          <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest flex items-center mt-3">
                             <span>Open in Google Maps</span>
                             <ChevronRight className="w-3 h-3 ml-0.5 group-hover:translate-x-0.5 transition-transform" />
                           </span>
@@ -441,20 +560,20 @@ export default function App() {
               </div>
 
               {/* Right Column: Chat Oracle Trigger Panel */}
-              <div className="w-full lg:w-[320px] bg-slate-900 border border-slate-800/80 rounded-2xl p-6 space-y-6 lg:sticky lg:top-24 flex flex-col items-center text-center" id="side-chat-panel">
-                <div className="p-3.5 bg-amber-500/10 text-amber-400 rounded-2xl animate-pulse">
+              <div className="w-full lg:w-[320px] bg-white border border-slate-200 rounded-3xl p-8 space-y-6 lg:sticky lg:top-32 flex flex-col items-center text-center shadow-sm" id="side-chat-panel">
+                <div className="p-4 bg-slate-100 text-slate-900 rounded-full">
                   <MessageSquare className="w-8 h-8" />
                 </div>
                 <div className="space-y-2">
-                  <h3 className="font-extrabold text-lg text-white">Ask the Food Oracle!</h3>
-                  <p className="text-xs text-slate-400 leading-relaxed">
+                  <h3 className="font-bold text-2xl text-slate-900">Ask the Oracle</h3>
+                  <p className="text-sm text-slate-500 leading-relaxed italic">
                     Have questions about these recommendations? Ask the Food Oracle about prices, vegan options, atmospheres, or best visit times!
                   </p>
                 </div>
                 <button
                   onClick={() => setIsChatOpen(true)}
                   id="btn-open-oracle-chat"
-                  className="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-sm rounded-xl transition-all shadow-lg flex items-center justify-center space-x-2 group"
+                  className="w-full py-4 bg-slate-900 text-white font-bold text-sm rounded-full transition-all shadow-lg hover:scale-105 active:scale-95 flex items-center justify-center space-x-2 group"
                 >
                   <span>Consult Oracle Chat</span>
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -473,19 +592,19 @@ export default function App() {
               className="text-center py-12 flex flex-col items-center justify-center space-y-4"
               id="error-results-screen"
             >
-              <div className="p-4 bg-rose-500/10 text-rose-500 rounded-full border border-rose-500/20">
+              <div className="p-4 bg-slate-100 text-slate-900 rounded-full">
                 <RotateCcw className="w-8 h-8 animate-spin" />
               </div>
               <div>
-                <h4 className="text-lg font-bold text-white">The Food Spirits are Silent</h4>
-                <p className="text-xs text-slate-400 max-w-xs mx-auto mt-2 leading-relaxed">
+                <h4 className="text-lg font-bold text-slate-900">The Food Spirits are Silent</h4>
+                <p className="text-xs text-slate-500 max-w-xs mx-auto mt-2 leading-relaxed italic">
                   {resultsError}
                 </p>
               </div>
               <button
                 onClick={handleReset}
                 id="btn-error-retry"
-                className="px-4 py-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-xl text-xs font-mono font-bold uppercase tracking-wider transition-colors text-slate-200"
+                className="px-6 py-3 bg-slate-900 text-white rounded-full text-xs font-bold uppercase tracking-wider transition-all hover:scale-105 active:scale-95 shadow-lg"
               >
                 Try Again
               </button>
@@ -503,8 +622,9 @@ export default function App() {
       />
 
       {/* Footer copyright */}
-      <footer className="border-t border-slate-900 py-6 text-center text-[10px] text-slate-600 font-mono" id="app-footer">
-        &copy; {new Date().getFullYear()} Food Quest. Harnessing Google Maps Grounding & Gemini. All rights reserved.
+      <footer className="px-10 py-6 border-t border-slate-100 flex items-center justify-between bg-white text-slate-500 text-[10px] uppercase font-bold tracking-wider" id="app-footer">
+        <div>&copy; {new Date().getFullYear()} Decision Engine.</div>
+        <div>Harnessing Google Maps & Gemini</div>
       </footer>
     </div>
   );

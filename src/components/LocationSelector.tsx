@@ -72,17 +72,13 @@ export default function LocationSelector({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -15 }}
       transition={{ duration: 0.4 }}
-      className="w-full max-w-md mx-auto bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl text-slate-100"
+      className="w-full max-w-md mx-auto bg-white border border-slate-200 rounded-3xl p-8 shadow-xl text-slate-800 relative overflow-hidden"
       id="location-selector-card"
     >
-      <div className="flex items-center space-x-3 mb-4">
-        <div className="p-2.5 bg-amber-500/10 text-amber-400 rounded-xl">
-          <MapPin className="w-6 h-6" />
-        </div>
-        <div>
-          <h2 className="text-xl font-bold tracking-tight text-white">Where are you hungry?</h2>
-          <p className="text-xs text-slate-400">Specify your location to find local spots.</p>
-        </div>
+      <div className="absolute top-0 left-0 w-full h-1 bg-slate-900"></div>
+      <div className="flex flex-col items-center mb-8">
+        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 block">Initialization</span>
+        <h2 className="text-3xl font-bold tracking-tight text-slate-900">Where are you hungry?</h2>
       </div>
 
       <div className="space-y-6">
@@ -92,81 +88,78 @@ export default function LocationSelector({
           onClick={handleDetectLocation}
           disabled={detecting}
           id="btn-detect-location"
-          className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all text-left group ${
+          className={`w-full flex items-center justify-between p-4 rounded-2xl border transition-all text-left group ${
             location.isUsingCoordinates && location.lat
-              ? "bg-emerald-950/30 border-emerald-500/50 text-emerald-300"
-              : "bg-slate-950/40 border-slate-800 hover:border-amber-500/50 hover:bg-slate-950/80 text-slate-200"
+              ? "bg-slate-50 border-slate-900 text-slate-900 shadow-sm"
+              : "bg-white border-slate-200 hover:border-slate-900 hover:shadow-md text-slate-600"
           }`}
         >
-          <div className="flex items-center space-x-3">
-            <div className={`p-2 rounded-lg ${location.isUsingCoordinates ? 'bg-emerald-500/10 text-emerald-400' : 'bg-slate-800 text-slate-400 group-hover:text-amber-400'}`}>
+          <div className="flex items-center space-x-4">
+            <div className={`p-2 rounded-full border-2 ${location.isUsingCoordinates ? 'border-slate-900 bg-slate-900 text-white' : 'border-slate-200 bg-slate-50 group-hover:border-slate-900 group-hover:bg-slate-900 group-hover:text-white transition-all text-slate-400'}`}>
               <Compass className={`w-5 h-5 ${detecting ? 'animate-spin' : ''}`} />
             </div>
             <div>
-              <span className="block font-medium text-sm text-white">Use Device Location</span>
-              <span className="block text-xs text-slate-400">
+              <span className={`block font-bold text-sm ${location.isUsingCoordinates ? 'text-slate-900' : 'text-slate-700'}`}>Use Device Location</span>
+              <span className="block text-[11px] text-slate-400 uppercase tracking-wider font-bold mt-1">
                 {location.isUsingCoordinates && location.lat
                   ? `Active: ${location.lat.toFixed(4)}, ${location.lng?.toFixed(4)}`
-                  : "Auto-detect via browser GPS"}
+                  : "Auto-detect via GPS"}
               </span>
             </div>
           </div>
           {location.isUsingCoordinates && location.lat ? (
-            <Check className="w-5 h-5 text-emerald-400" />
+            <Check className="w-5 h-5 text-slate-900" />
           ) : (
-            <Navigation className="w-4 h-4 text-slate-500 group-hover:text-amber-400 group-hover:translate-x-0.5 transition-transform" />
+            <Navigation className="w-4 h-4 text-slate-300 group-hover:text-slate-900 group-hover:translate-x-1 transition-all" />
           )}
         </button>
 
-        <div className="relative flex py-1 items-center">
-          <div className="flex-grow border-t border-slate-800"></div>
-          <span className="flex-shrink mx-4 text-xs text-slate-500 uppercase tracking-widest font-mono">OR</span>
-          <div className="flex-grow border-t border-slate-800"></div>
+        <div className="relative flex py-2 items-center">
+          <div className="flex-grow border-t border-slate-100"></div>
+          <span className="flex-shrink mx-4 text-[10px] text-slate-400 uppercase tracking-widest font-bold">OR</span>
+          <div className="flex-grow border-t border-slate-100"></div>
         </div>
 
         {/* Manual Input Form */}
         <form onSubmit={handleManualSubmit} className="space-y-4" id="manual-location-form">
           <div>
-            <label htmlFor="location-input" className="block text-xs font-medium text-slate-400 uppercase tracking-wider mb-2">
-              Enter City, Zip Code, or Address
-            </label>
             <div className="relative">
               <input
                 id="location-input"
                 type="text"
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
-                placeholder="e.g. Seattle, WA or 90210"
-                className="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
+                placeholder="Enter City, Zip Code, or Address"
+                className="w-full bg-slate-50 border border-slate-200 focus:border-slate-900 focus:ring-1 focus:ring-slate-900 focus:bg-white rounded-2xl px-5 py-4 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all font-medium"
               />
             </div>
           </div>
 
           {location.error && (
-            <div className="flex items-start space-x-2 text-rose-400 bg-rose-950/20 border border-rose-900/30 p-3 rounded-lg text-xs">
+            <div className="flex items-start space-x-2 text-rose-600 bg-rose-50 border border-rose-100 p-4 rounded-2xl text-xs font-medium">
               <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
               <span>{location.error}</span>
             </div>
           )}
 
-          <div className="flex space-x-3 pt-2">
+          <div className="flex space-x-3 pt-4">
             {location.isUsingCoordinates && location.lat ? (
               <button
                 type="button"
                 onClick={onConfirm}
                 id="btn-confirm-coords"
-                className="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-sm rounded-xl transition-all shadow-lg shadow-emerald-950/30 flex items-center justify-center space-x-2"
+                className="w-full py-4 px-6 bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm rounded-full transition-all shadow-xl hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center space-x-2"
               >
-                <span>Continue with GPS Location</span>
+                <span>Continue with GPS</span>
               </button>
             ) : (
               <button
                 type="submit"
                 disabled={!inputText.trim()}
                 id="btn-submit-location"
-                className="w-full py-3 px-4 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 disabled:hover:bg-amber-500 text-slate-950 font-semibold text-sm rounded-xl transition-all shadow-lg shadow-amber-950/30"
+                className="w-full py-4 px-6 bg-slate-900 hover:bg-slate-800 disabled:opacity-50 disabled:hover:bg-slate-900 disabled:hover:scale-100 text-white font-bold text-sm rounded-full transition-all shadow-xl hover:scale-[1.02] active:scale-[0.98]"
               >
-                Let's Play!
+                SHUFFLE THE DECK
               </button>
             )}
           </div>

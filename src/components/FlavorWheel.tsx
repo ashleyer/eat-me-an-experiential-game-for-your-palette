@@ -112,18 +112,18 @@ export default function FlavorWheel({ onComplete, onBack }: FlavorWheelProps) {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto flex flex-col items-center h-[540px] justify-between text-slate-100" id="flavor-wheel-game">
+    <div className="w-full max-w-md mx-auto flex flex-col items-center h-[540px] justify-between text-slate-800" id="flavor-wheel-game">
       {/* Header */}
       <div className="w-full flex items-center justify-between px-4 mb-2">
         <button
           onClick={onBack}
-          className="text-xs text-slate-400 hover:text-white flex items-center space-x-1 font-mono uppercase tracking-wider"
+          className="text-[10px] text-slate-400 hover:text-slate-900 flex items-center space-x-1 font-bold uppercase tracking-widest transition-colors"
           id="btn-wheel-back"
         >
           <RotateCcw className="w-3.5 h-3.5" />
           <span>Exit Game</span>
         </button>
-        <span className="text-xs text-amber-400 font-mono font-bold tracking-widest bg-amber-500/10 px-2.5 py-1 rounded-full">
+        <span className="text-[10px] text-slate-900 font-bold tracking-widest bg-slate-100 px-3 py-1.5 rounded-full uppercase">
           MYSTIC FOOD WHEEL
         </span>
       </div>
@@ -132,14 +132,14 @@ export default function FlavorWheel({ onComplete, onBack }: FlavorWheelProps) {
       <div className="relative w-full flex-grow flex flex-col items-center justify-center my-4 h-[340px]">
         {/* Pointer Indicator */}
         <div className="absolute top-0 z-20 flex flex-col items-center -translate-y-2">
-          <div className="w-0 h-0 border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-t-[16px] border-t-amber-400 drop-shadow-lg"></div>
-          <div className="w-3 h-3 bg-amber-500 rounded-full border border-slate-900 -mt-1 shadow"></div>
+          <div className="w-0 h-0 border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-t-[16px] border-t-slate-900 drop-shadow-lg"></div>
+          <div className="w-3 h-3 bg-slate-900 rounded-full border border-white -mt-1 shadow"></div>
         </div>
 
         {/* Wheel SVG */}
-        <div className="relative w-[280px] h-[280px] rounded-full shadow-2xl border-4 border-slate-950 bg-slate-950 flex items-center justify-center overflow-visible">
+        <div className="relative w-[280px] h-[280px] rounded-full shadow-xl border-4 border-white bg-white flex items-center justify-center overflow-visible">
           {/* Inner ring background */}
-          <div className="absolute w-[96%] h-[96%] rounded-full border border-slate-800/40 bg-slate-900/30"></div>
+          <div className="absolute w-[96%] h-[96%] rounded-full border border-slate-100 bg-slate-50"></div>
 
           <svg
             viewBox="0 0 200 200"
@@ -189,15 +189,15 @@ export default function FlavorWheel({ onComplete, onBack }: FlavorWheelProps) {
                     d={pathData}
                     fill={sector.color}
                     opacity={0.85}
-                    stroke="#020617"
-                    strokeWidth="1.5"
+                    stroke="#ffffff"
+                    strokeWidth="2"
                     className="hover:opacity-100 transition-opacity"
                   />
                   {/* Slice Text */}
                   <text
                     x={tx}
                     y={ty}
-                    fill="#020617"
+                    fill="#ffffff"
                     fontSize="7"
                     fontWeight="800"
                     textAnchor="middle"
@@ -223,7 +223,7 @@ export default function FlavorWheel({ onComplete, onBack }: FlavorWheelProps) {
             })}
 
             {/* Hub */}
-            <circle cx="100" cy="100" r="16" fill="#020617" stroke="#334155" strokeWidth="1.5" />
+            <circle cx="100" cy="100" r="16" fill="#ffffff" stroke="#e2e8f0" strokeWidth="2" />
           </svg>
 
           {/* Center Hub Logo Button */}
@@ -231,7 +231,7 @@ export default function FlavorWheel({ onComplete, onBack }: FlavorWheelProps) {
             onClick={handleSpin}
             disabled={isSpinning}
             id="btn-spin-wheel-center"
-            className="absolute w-14 h-14 rounded-full bg-slate-950 hover:bg-amber-500 hover:text-slate-950 text-amber-400 border border-slate-800 focus:outline-none flex flex-col items-center justify-center transition-all shadow-xl font-bold font-mono text-[10px] uppercase tracking-wider z-10 disabled:opacity-50 disabled:bg-slate-900 disabled:text-slate-500"
+            className="absolute w-14 h-14 rounded-full bg-slate-900 hover:bg-slate-800 text-white border-2 border-white focus:outline-none flex flex-col items-center justify-center transition-all shadow-xl font-bold text-[10px] uppercase tracking-wider z-10 disabled:opacity-50 disabled:bg-slate-200 disabled:text-slate-500"
           >
             <span>SPIN</span>
           </button>
@@ -247,14 +247,14 @@ export default function FlavorWheel({ onComplete, onBack }: FlavorWheelProps) {
             className="flex flex-col items-center"
             id="wheel-outcome-display"
           >
-            <div className="flex items-center space-x-1 text-sm font-bold text-amber-400">
-              <Sparkles className="w-4 h-4" />
+            <div className="flex items-center space-x-1 text-sm font-bold text-slate-900">
+              <Sparkles className="w-4 h-4 text-slate-900" />
               <span>It landed on {chosenSector.label}!</span>
             </div>
-            <span className="text-xs text-slate-400 mt-1">"{chosenSector.description}"</span>
+            <span className="text-xs text-slate-500 mt-1 italic">"{chosenSector.description}"</span>
           </motion.div>
         ) : (
-          <p className="text-xs text-slate-500 italic max-w-xs font-mono">
+          <p className="text-xs text-slate-400 italic max-w-xs">
             Click SPIN to let the culinary spirits decide your meal!
           </p>
         )}

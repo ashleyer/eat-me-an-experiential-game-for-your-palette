@@ -106,19 +106,19 @@ export default function FlavorSwiper({ onComplete, onBack }: FlavorSwiperProps) 
   };
 
   return (
-    <div className="w-full max-w-md mx-auto flex flex-col items-center h-[540px] justify-between text-slate-100" id="flavor-swiper-game">
+    <div className="w-full max-w-md mx-auto flex flex-col items-center h-[540px] justify-between text-slate-800" id="flavor-swiper-game">
       {/* Game Header */}
       <div className="w-full flex items-center justify-between px-4 mb-2">
         <button
           onClick={onBack}
-          className="text-xs text-slate-400 hover:text-white flex items-center space-x-1 font-mono uppercase tracking-wider"
+          className="text-[10px] text-slate-400 hover:text-slate-900 flex items-center space-x-1 font-bold uppercase tracking-widest transition-colors"
           id="btn-swiper-back"
         >
           <RotateCcw className="w-3.5 h-3.5" />
           <span>Exit Game</span>
         </button>
-        <span className="text-xs text-amber-400 font-mono font-bold tracking-widest bg-amber-500/10 px-2.5 py-1 rounded-full">
-          CRAVING SWIPER: {Math.min(currentIndex + 1, cards.length)} / {cards.length}
+        <span className="text-[10px] text-slate-900 font-bold tracking-widest bg-slate-100 px-3 py-1.5 rounded-full uppercase">
+          {Math.min(currentIndex + 1, cards.length)} / {cards.length}
         </span>
       </div>
 
@@ -147,24 +147,24 @@ export default function FlavorSwiper({ onComplete, onBack }: FlavorSwiperProps) 
             >
               {/* Card top banner */}
               <div className="flex flex-col space-y-1">
-                <span className="text-xs font-mono font-semibold uppercase tracking-widest text-white/70">
-                  Flavor Vibe
+                <span className="text-[10px] font-bold uppercase tracking-widest text-white/80">
+                  Flavor Profile
                 </span>
-                <h3 className="text-2xl font-extrabold text-white tracking-tight drop-shadow-md">
+                <h3 className="text-3xl font-bold text-white tracking-tight drop-shadow-md">
                   {activeCard.title}
                 </h3>
               </div>
 
               {/* Card body description */}
-              <div className="bg-black/20 backdrop-blur-sm border border-white/10 rounded-xl p-4 my-2 flex-grow flex flex-col justify-center">
-                <p className="text-sm leading-relaxed text-white font-medium drop-shadow-sm mb-3">
+              <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-5 my-2 flex-grow flex flex-col justify-center">
+                <p className="text-sm leading-relaxed text-white drop-shadow-sm mb-4 italic">
                   "{activeCard.vibe}"
                 </p>
-                <div className="flex flex-wrap gap-1.5 mt-auto">
+                <div className="flex flex-wrap gap-2 mt-auto">
                   {activeCard.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="text-[10px] font-mono font-semibold bg-white/20 text-white px-2.5 py-0.5 rounded-full"
+                      className="text-[10px] font-bold tracking-wider bg-white/20 text-white px-3 py-1 rounded-full uppercase"
                     >
                       {tag}
                     </span>
@@ -173,7 +173,7 @@ export default function FlavorSwiper({ onComplete, onBack }: FlavorSwiperProps) 
               </div>
 
               {/* Helper instruction */}
-              <div className="text-center text-[10px] text-white/50 font-mono tracking-wider">
+              <div className="text-center text-[10px] text-white/70 font-bold uppercase tracking-widest">
                 Swipe Right to Yum | Left to Nah
               </div>
             </motion.div>
@@ -184,12 +184,12 @@ export default function FlavorSwiper({ onComplete, onBack }: FlavorSwiperProps) 
               className="text-center flex flex-col items-center justify-center space-y-4"
               id="swiper-complete-loading"
             >
-              <div className="p-4 bg-amber-500/10 text-amber-400 rounded-full animate-pulse border border-amber-500/20">
+              <div className="p-4 bg-slate-100 text-slate-900 rounded-full animate-pulse border border-slate-200">
                 <Award className="w-8 h-8" />
               </div>
               <div>
-                <h4 className="text-lg font-bold text-white">Cravings Calculated!</h4>
-                <p className="text-xs text-slate-400 max-w-[240px] mx-auto mt-1">
+                <h4 className="text-2xl font-bold text-slate-900">Cravings Calculated!</h4>
+                <p className="text-sm text-slate-500 max-w-[240px] mx-auto mt-2 italic">
                   Synthesizing your culinary profile to search local menus...
                 </p>
               </div>
@@ -200,11 +200,11 @@ export default function FlavorSwiper({ onComplete, onBack }: FlavorSwiperProps) 
 
       {/* Buttons Deck */}
       {currentIndex < cards.length && (
-        <div className="w-full flex justify-center items-center space-x-6 pb-2" id="swiper-buttons-container">
+        <div className="w-full flex justify-center items-center space-x-8 pb-2" id="swiper-buttons-container">
           <button
             onClick={() => handleSwipe(false)}
             id="btn-swiper-nah"
-            className="w-14 h-14 bg-slate-950 border border-slate-800 text-rose-500 hover:text-white hover:bg-rose-600 hover:border-rose-500 rounded-full flex items-center justify-center transition-all duration-200 shadow-xl"
+            className="w-16 h-16 bg-white border border-slate-200 text-rose-500 hover:text-white hover:bg-rose-500 hover:border-rose-500 rounded-full flex items-center justify-center transition-all duration-200 shadow-md hover:scale-105 active:scale-95"
             title="Pass"
           >
             <X className="w-6 h-6" />
@@ -213,7 +213,7 @@ export default function FlavorSwiper({ onComplete, onBack }: FlavorSwiperProps) 
           <button
             onClick={handleReset}
             id="btn-swiper-restart"
-            className="w-10 h-10 bg-slate-950 border border-slate-800 text-slate-400 hover:text-white rounded-full flex items-center justify-center transition-all duration-200"
+            className="w-12 h-12 bg-white border border-slate-200 text-slate-400 hover:text-slate-900 hover:border-slate-900 rounded-full flex items-center justify-center transition-all duration-200 shadow-sm"
             title="Restart"
           >
             <RotateCcw className="w-4 h-4" />
@@ -222,7 +222,7 @@ export default function FlavorSwiper({ onComplete, onBack }: FlavorSwiperProps) 
           <button
             onClick={() => handleSwipe(true)}
             id="btn-swiper-yum"
-            className="w-14 h-14 bg-slate-950 border border-slate-800 text-emerald-400 hover:text-slate-950 hover:bg-emerald-400 hover:border-emerald-400 rounded-full flex items-center justify-center transition-all duration-200 shadow-xl"
+            className="w-16 h-16 bg-white border border-slate-200 text-emerald-500 hover:text-white hover:bg-emerald-500 hover:border-emerald-500 rounded-full flex items-center justify-center transition-all duration-200 shadow-md hover:scale-105 active:scale-95"
             title="Yum!"
           >
             <Heart className="w-6 h-6 fill-current" />
